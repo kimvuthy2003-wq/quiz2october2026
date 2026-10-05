@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ច្បាប់ចលនាញូតុន (Quiz 2)</title>
+    <style>
+        body { font-family: 'Khmer OS Siemreap', Arial, sans-serif; padding: 20px; background-color: #f0f8ff; /* ពណ៌សផ្ទៃមេឃ */ margin: 0;}
+        .tab-container { display: flex; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; background: #1e293b; padding: 10px; border-radius: 8px; max-width: 950px; margin: 0 auto 20px;}
+        .tab-btn { background-color: #334155; color: #cbd5e1; border: none; padding: 12px 24px; margin: 5px; cursor: pointer; font-size: 16px; border-radius: 8px; transition: 0.3s; font-family: inherit; font-weight: bold;}
+        .tab-btn:hover { background-color: #475569; }
+        .tab-btn.active { background-color: #38bdf8; color: #0f172a; }
+        .tab-btn.quiz-active { background-color: #2ecc71; color: white; }
+
+        .tab-content { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; max-width: 950px; margin: 0 auto;}
+        .tab-content.active { display: block; }
+        
+        canvas { border: 2px solid #b0bec5; background-color: #e0f7fa; margin-top: 15px; border-radius: 5px; max-width: 100%; }
+        .controls { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+        button.action-btn { background-color: #28a745; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-family: inherit; margin-top: 10px; font-weight: bold;}
+        button.reset-btn { background-color: #e65100; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-family: inherit; margin-top: 10px; font-weight: bold;}
+        input[type=range] { cursor: pointer; }
+        
+        /* Quiz Styles */
+        .question-block { text-align: left; background: #fdfbfb; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; margin-bottom: 15px;}
+        .question-block p { margin-top: 0; font-weight: bold;}
+        .question-block label { display: block; margin-bottom: 8px; cursor: pointer; padding: 5px;}
+        .question-block label:hover {background: #e2e8f0; border-radius: 4px;}
+        
+        .student-info { background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;}
+        .student-info select { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; font-family: inherit; font-size: 16px;}
+        .submit-btn { background: #2ecc71; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; font-family: inherit;}
+        .submit-btn:hover { background: #27ae60; }
+        .submit-btn:disabled { background: #95a5a6; cursor: not-allowed; }
+        
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center;}
+        .modal-box { background-color: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 5px 20px rgba(0,0,0,0.3); animation: popIn 0.3s ease-out;}
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-box h3 { color: #2ecc71; margin-top: 0; font-size: 24px; margin-bottom: 10px;}
+        .modal-btn { background-color: #3498db; color: white; border: none; padding: 10px 30px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: inherit;}
+    </style>
+</head>
+<body>
+
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="openTab(event, 'tab1')">១. ច្បាប់ទី១</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab2')">២. ច្បាប់ទី២</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab3')">៣. ច្បាប់ទី៣</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab4')">៤. ប្លង់ទេរ</button>
+        <button class="tab-btn" onclick="openTab(event, 'quiz-tab')">៥. កម្រងសំណួរ (Quiz ២)</button>
+    </div>
+
+    <!-- Tab 1 -->
+    <div id="tab1" class="tab-content active">
+        <h3>ច្បាប់ទី១ញូតុន និង កម្លាំងកកិត (Inertia & Friction)</h3>
+        <canvas id="canvas1" width="700" height="200"></canvas><br>
+        <div class="controls">
+            <label>មេគុណកកិត (μ): <span id="mu_val">0</span></label><br>
+            <input type="range" id="mu_slider" min="0" max="0.5" step="0.05" value="0" oninput="updateTab1()"><br>
+            <button class="action-btn" onclick="pushObject()">រុញប្រអប់</button>
+            <button class="reset-btn" onclick="resetTab1()">កំណត់ឡើងវិញ</button>
+        </div>
+    </div>
+
+    <!-- Tab 2 -->
+    <div id="tab2" class="tab-content">
+        <h3>ច្បាប់ទី២ញូតុន (F = ma)</h3>
+        <canvas id="canvas2" width="700" height="200"></canvas><br>
+        <div class="controls">
+            <label>ម៉ាស (m): <span id="m_val">10</span> kg</label><br>
+            <input type="range" id="m_slider" min="5" max="50" value="10" oninput="updateTab2()"><br>
+            <label>កម្លាំងទាញ (F): <span id="f_val">20</span> N</label><br>
+            <input type="range" id="f_slider" min="0" max="100" value="20" oninput="updateTab2()"><br>
+            <strong>សំទុះ (a) = <span id="a_val" style="color:red;">2.00</span> m/s²</strong><br>
+            <button class="action-btn" onclick="startTab2()">ចាប់ផ្តើម</button>
+            <button class="reset-btn" onclick="resetTab2()">កំណត់ឡើងវិញ</button>
+        </div>
+    </div>
+
+    <!-- Tab 3 -->
+    <div id="tab3" class="tab-content">
+        <h3>ច្បាប់ទី៣ញូតុន (សកម្មភាព និង ប្រតិកម្ម)</h3>
+        <canvas id="canvas3" width="700" height="200"></canvas><br>
+        <div class="controls">
+            <label>កម្លាំងទាញ (F): <span id="f3_val">50</span> N</label><br>
+            <input type="range" id="f3_slider" min="10" max="150" value="50" oninput="drawTab3()"><br>
+            <p><strong>F<sub>12</sub> = - F<sub>21</sub></strong></p>
+        </div>
+    </div>
+
+    <!-- Tab 4 -->
+    <div id="tab4" class="tab-content">
+        <h3>ការអនុវត្តច្បាប់ញូតុន លើប្លង់ទេរ</h3>
+        <canvas id="canvas4" width="700" height="300"></canvas><br>
+        <div class="controls">
+            <label>មុំប្លង់ទេរ (θ): <span id="angle_val">30</span>°</label><br>
+            <input type="range" id="angle_slider" min="0" max="60" value="30" oninput="updateTab4()"><br>
+            <button class="action-btn" onclick="startTab4()">អិលចុះ</button>
+            <button class="reset-btn" onclick="resetTab4()">កំណត់ឡើងវិញ</button>
+        </div>
+    </div>
+
+    <!-- ផ្នែកទី២: Quiz -->
+    <div id="quiz-tab" class="tab-content">
+        <div id="quiz-container">
+            <h2 style="text-align: center; color: #2c3e50;">កម្រងសំណួរទី២៖ ច្បាប់ចលនារបស់ញូតុន (៥០ ពិន្ទុ)</h2>
+            <div class="student-info">
+                <label><b>ជ្រើសរើសថ្នាក់៖</b></label>
+                <select id="classSelect" onchange="updateStudentList()"><option value="G10A">ថ្នាក់ទី ១០A</option><option value="G10B">ថ្នាក់ទី ១០B</option></select>
+                <label><b>ជ្រើសរើសឈ្មោះ៖</b></label>
+                <select id="nameSelect"></select>
+            </div>
+            
+            <div class="question-block">
+                <p>១. ផ្អែកលើការពិសោធន៍ច្បាប់ទី១ ប្រសិនបើមេគុណកកិត (μ) ធំជាងសូន្យ តើប្រអប់ដែលកំពុងរអិលនឹងទៅជាយ៉ាងណា?</p>
+                <label><input type="radio" name="q1" value="0"> ក. រអិលរហូតមិនឈប់</label>
+                <label><input type="radio" name="q1" value="10"> ខ. បន្ថយល្បឿនរហូតដល់ឈប់</label>
+                <label><input type="radio" name="q1" value="0"> គ. បង្កើនល្បឿនកាន់តែលឿន</label>
+            </div>
+            <div class="question-block">
+                <p>២. តាមរូបមន្តច្បាប់ទី២ញូតុន ប្រសិនបើគេទាញប្រអប់ម៉ាស 10kg ដោយកម្លាំង 20N តើសំទុះមានតម្លៃប៉ុន្មាន?</p>
+                <label><input type="radio" name="q2" value="0"> ក. 0.5 m/s²</label>
+                <label><input type="radio" name="q2" value="10"> ខ. 2.0 m/s²</label>
+                <label><input type="radio" name="q2" value="0"> គ. 200 m/s²</label>
+            </div>
+            <div class="question-block">
+                <p>៣. យោងតាមច្បាប់ទី៣ញូតុន (សកម្មភាព និងប្រតិកម្ម) បើវត្ថុ A ទាញវត្ថុ B ដោយកម្លាំង 50N នោះវត្ថុ B ទាញវត្ថុ A វិញដោយកម្លាំងប៉ុន្មាន?</p>
+                <label><input type="radio" name="q3" value="0"> ក. 50N</label>
+                <label><input type="radio" name="q3" value="10"> ខ. -50N</label>
+                <label><input type="radio" name="q3" value="0"> គ. 0N</label>
+            </div>
+            <div class="question-block">
+                <p>៤. នៅក្នុងការអនុវត្តលើប្លង់ទេរ តើកម្លាំងមួយណាដែលទាញប្រអប់ឱ្យរអិលចុះតាមបណ្តោយប្លង់ទេរ?</p>
+                <label><input type="radio" name="q4" value="0"> ក. កម្លាំង Py</label>
+                <label><input type="radio" name="q4" value="10"> ខ. កម្លាំង Px</label>
+                <label><input type="radio" name="q4" value="0"> គ. កម្លាំងប្រតិកម្ម N</label>
+            </div>
+            <div class="question-block">
+                <p>៥. នៅពេលវត្ថុស្ថិតនៅលើប្លង់ទេរ តើកម្លាំងប្រតិកម្មកែង (N) របស់ផ្ទៃប្លង់ មានទំហំស្មើគ្នានឹងកម្លាំងមួយណា?</p>
+                <label><input type="radio" name="q5" value="0"> ក. កម្លាំង Px</label>
+                <label><input type="radio" name="q5" value="10"> ខ. កម្លាំង Py នៃទម្ងន់</label>
+                <label><input type="radio" name="q5" value="0"> គ. កម្លាំងទម្ងន់សរុប P = mg</label>
+            </div>
+            <button id="submitBtn" class="submit-btn" onclick="submitQuiz()">បញ្ជូនចម្លើយទៅកាន់គ្រូ</button>
+        </div>
+    </div>
+
+    <!-- លាក់ឈ្មោះសិស្សពី CSV ខែតុលា 2026 -->
+    <div id="names-10A" style="display: none;">
+        <option value="ណុប​ សុខវិជ្ជា">ណុប​​ សុខវិជ្ជា</option><option value="អែម គុណនីកា">អែម គុណនីកា</option><option value="រិទ្ធ សុករក្សា">រិទ្ធ សុករក្សា</option><option value="លឹមថា អ៊ួងសម្ប័ទ">លឹមថា អ៊ួងសម្ប័ទ</option><option value="ភាព ហេងរតនៈ">ភាព ហេងរតនៈ</option><option value="ញ៉ាំ វង្សវឌ្ឍនៈ">ញ៉ាំ វង្សវឌ្ឍនៈ</option><option value="ហាន ស៊ុនឆាយ">ហាន ស៊ុនឆាយ</option><option value="យន ចានណាលីន">យន ចានណាលីន</option><option value="ហេង គីមឈីង">ហេង គីមឈីង</option><option value="ជូ សុវណ្ណអ៊ីហុង">ជូ សុវណ្ណអ៊ីហុង</option><option value="គឹម ដូណា">គឹម ដូណា</option><option value="សុខុម​​​​​​​​ សូរីតា">សុខុម​​​​​​​​ សូរីតា</option><option value="ភូ វីរៈជាតិ">ភូ វីរៈជាតិ</option><option value="អ៊ី ​ឆាយអាន">អ៊ី ​ឆាយអាន</option><option value="ថាន មិថុនា">ថាន មិថុនា</option><option value="អ៊ុក ​ហេងនិម្មល">អ៊ុក ​ហេងនិម្មល</option><option value="អេង ស៊ាងតូង">អេង ស៊ាងតូង</option><option value="ភូ លីហ៊ាង">ភូ លីហ៊ាង</option><option value="ចេង ម៉េងឈាង">ចេង ម៉េងឈាង</option><option value="សុិន ​អែនជីលីតា">សុិន ​អែនជីលីតា</option><option value="គុណ រចនា">គុណ រចនា</option><option value="ហេង​ លីហ្សា">ហេង​ លីហ្សា</option>
+
+    </div>
+    <div id="names-10B" style="display: none;">
+        <option value="សឺន ចន្ធា">សឺន ចន្ធា</option><option value="លន់ គីមឡាង">លន់ គីមឡាង</option><option value="ជួប ពេជ្រច័ន្ទម៉ាណា">ជួប ពេជ្រច័ន្ទម៉ាណា</option><option value="ជីវ សុម៉ីជីង">ជីវ សុម៉ីជីង</option><option value="តាន ទិព្វលីហ្សា">តាន ទិព្វលីហ្សា</option><option value="ស៊ុន ហាចសុវរៈ">ស៊ុន ហាចសុវរៈ</option><option value="ហង្ស មយូរ៉ា">ហង្ស មយូរ៉ា</option><option value="វ៉ែន គង់សុខពិសី">វ៉ែន គង់សុខពិសី</option><option value="ឈឹម មុនីរតន៏">ឈឹម មុនីរតន៏</option><option value="ស៊ុយ ធាយ៉ារ៉ា">ស៊ុយ ធាយ៉ារ៉ា</option><option value="ឡាយ ហ្គ្រួចថូ">ឡាយ ហ្គ្រួចថូ</option><option value="ចន ចំរុង">ចន ចំរុង</option><option value="រដ្ឋ វេហា">រដ្ឋ វេហា</option><option value="លី ថាហ្វូ">លី ថាហ្វូ</option><option value="វី រតនា">វី រតនា</option><option value="ធា វីរ:យុទ្ធ">ធា វីរ:យុទ្ធ</option><option value="ឈុត​ គឹមសួគ៍">ឈុត​ គឹមសួគ៍</option><option value="ផល សុផាណិត">ផល សុផាណិត</option><option value="ច្រិច​ ម៉ាយុ">ច្រិច​ ម៉ាយុ</option><option value="ឃី ច័ន្ទរាស័ក្ត">ឃី ច័ន្ទរាស័ក្ត</option><option value="ជិន ស្រីនីត">ជិន ស្រីនីត</option><option value="ឌី សុគន្ធារី">ឌី សុគន្ធារី</option><option value="សន ចិន្ដា">សន ចិន្ដា</option><option value="អេន សុខហេង">អេន សុខហេង</option> <option value="យានវីរះ រតនះ">យានវីរះ រតនះ</option>
+
+    </div>
+
+    <!-- Modal -->
+    <div id="successModal" class="modal-overlay"><div class="modal-box"><h3>✅ ជោគជ័យ!</h3><p id="modalMessage"></p><button class="modal-btn" onclick="closeModal()">OK (បិទផ្ទាំង)</button></div></div>
+
+    <script>
+        function openTab(evt, tabName) {
+            document.querySelectorAll(".tab-content").forEach(el => el.style.display = "none");
+            document.querySelectorAll(".tab-btn").forEach(el => { el.classList.remove("active"); el.classList.remove("quiz-active"); });
+            document.getElementById(tabName).style.display = "block";
+            if(tabName === 'quiz-tab') evt.currentTarget.classList.add("quiz-active");
+            else evt.currentTarget.classList.add("active");
+        }
+        function updateStudentList() {
+            let cls = document.getElementById("classSelect").value;
+            let sel = document.getElementById("nameSelect");
+            sel.innerHTML = '<option value="">-- សូមជ្រើសរើសឈ្មោះរបស់អ្នក --</option>';
+            sel.innerHTML += document.getElementById(cls === "G10A" ? "names-10A" : "names-10B").innerHTML;
+        }
+        window.onload = updateStudentList;
+        function showModal(msg) { document.getElementById("modalMessage").innerText = msg; document.getElementById("successModal").style.display = "flex"; }
+        function closeModal() { document.getElementById("successModal").style.display = "none"; }
+
+        function submitQuiz() {
+            let cls = document.getElementById('classSelect').value;
+            let name = document.getElementById('nameSelect').value;
+            if (!cls || !name) return alert("សូមជ្រើសរើសឈ្មោះ និងថ្នាក់!");
+            let score = 0, count = 0;
+            for (let i = 1; i <= 5; i++) {
+                let rad = document.getElementsByName('q' + i);
+                for (let r of rad) if (r.checked) { score += parseInt(r.value); count++; break; }
+            }
+            if (count < 5) return alert("សូមឆ្លើយសំណួរឱ្យបានគ្រប់ទាំង ៥!");
+            
+            let btn = document.getElementById('submitBtn'); 
+            btn.innerText = "កំពុងបញ្ជូន..."; btn.disabled = true; // បិទមិនឱ្យចុចពីរដង
+            
+            // ⚠️ ដាក់ Web App URL ថ្មីនៅទីនេះ ⚠️
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxMtAGPu-YprT3P3JRZHHIAN24xa6nhn69DxZ6M6P4iWXMrnEOtwDUPQ3lbSy1aIbqW/exec';
+            let fd = new URLSearchParams();
+            fd.append("sheetName", cls); fd.append("name", name); fd.append("score", score); 
+            fd.append("quizNumber", "Q2"); // ចូល Q2 (Column F)
+
+            if(scriptURL.includes('YOUR_GOOGLE')) {
+                alert("សូមដាក់ Web App URL នៅក្នុងកូដជាមុនសិន!");
+                btn.innerText = "បញ្ជូនចម្លើយទៅកាន់គ្រូ"; btn.disabled = false; return;
+            }
+            fetch(scriptURL, { method: "POST", body: fd })
+            .then(r => r.text()).then(res => {
+                if(res === "Success") {
+                    showModal(`កិច្ចការរបស់អ្នកត្រូវបានបញ្ជូនទៅលោកគ្រូរួចរាល់ដោយជោគជ័យ!`);
+                    btn.innerText = "បានបញ្ជូនរួចរាល់ ✅"; // រក្សាការបិទប៊ូតុង
+                } else {
+                    alert("មានបញ្ហា៖ " + res);
+                    btn.innerText = "បញ្ជូនចម្លើយទៅកាន់គ្រូ"; btn.disabled = false;
+                }
+            }).catch(err => { alert("មានបញ្ហាបណ្តាញទាក់ទង!"); btn.innerText = "បញ្ជូនចម្លើយទៅកាន់គ្រូ"; btn.disabled = false; });
+        }
+
+        // --- SIMULATION LOGIC ---
+        function drawArrow(ctx, fromx, fromy, tox, toy, color) {
+            let headlen = 12; let dx = tox - fromx; let dy = toy - fromy; let angle = Math.atan2(dy, dx);
+            ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.moveTo(fromx, fromy); ctx.lineTo(tox, toy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(tox, toy); ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6)); ctx.closePath(); ctx.fill();
+        }
+
+        // Tab 1 Logic
+        let c1 = document.getElementById('canvas1').getContext('2d');
+        let obj1 = { x: 50, v: 0, mu: 0 }; let anim1;
+        function updateTab1() { obj1.mu = parseFloat(document.getElementById('mu_slider').value); document.getElementById('mu_val').innerText = obj1.mu == 0 ? "0" : obj1.mu; if(obj1.v === 0) draw1(); }
+        function pushObject() { if(obj1.v === 0) { obj1.v = 5; loopTab1(); } }
+        function resetTab1() { cancelAnimationFrame(anim1); obj1.x = 50; obj1.v = 0; draw1(); }
+        function draw1() {
+            c1.clearRect(0,0,700,200); c1.fillStyle = '#95a5a6'; c1.fillRect(0, 150, 700, 50); c1.fillStyle = '#e67e22'; c1.fillRect(obj1.x, 100, 50, 50); 
+            if(obj1.v > 0) {
+                drawArrow(c1, obj1.x + 50, 125, obj1.x + 90, 125, '#2ecc71'); c1.fillStyle = '#2ecc71'; c1.font = "16px Arial"; c1.fillText("v", obj1.x + 95, 120);
+                if(obj1.mu > 0) { let fLen = obj1.mu * 120; drawArrow(c1, obj1.x, 140, obj1.x - fLen, 140, 'red'); c1.fillStyle = 'red'; c1.fillText("f", obj1.x - fLen - 15, 145); }
+            }
+        }
+        function loopTab1() {
+            if(obj1.v > 0) { let a = obj1.mu * 0.5; obj1.v -= a; if(obj1.v < 0) obj1.v = 0; obj1.x += obj1.v; }
+            if(obj1.x > 650) obj1.x = 0; draw1(); if(obj1.v > 0) anim1 = requestAnimationFrame(loopTab1);
+        }
+        draw1();
+
+        // Tab 2 Logic
+        let c2 = document.getElementById('canvas2').getContext('2d');
+        let obj2 = { x: 50, v: 0, m: 10, F: 20, running: false }; let anim2;
+        function updateTab2() { obj2.m = document.getElementById('m_slider').value; obj2.F = document.getElementById('f_slider').value; document.getElementById('m_val').innerText = obj2.m; document.getElementById('f_val').innerText = obj2.F; document.getElementById('a_val').innerText = (obj2.F / obj2.m).toFixed(2); if(!obj2.running) draw2(); }
+        function startTab2() { if(!obj2.running) { obj2.running = true; loopTab2(); } }
+        function resetTab2() { obj2.running = false; obj2.x = 50; obj2.v = 0; cancelAnimationFrame(anim2); draw2(); }
+        function draw2() {
+            c2.clearRect(0,0,700,200); c2.fillStyle = '#95a5a6'; c2.fillRect(0, 150, 700, 50); c2.fillStyle = '#3498db'; c2.fillRect(obj2.x, 100, 50, 50); c2.fillStyle = 'white'; c2.font = "14px Arial"; c2.fillText(obj2.m + "kg", obj2.x + 10, 130);
+            if(obj2.F > 0) { drawArrow(c2, obj2.x + 50, 125, obj2.x + 50 + Number(obj2.F)*1.5, 125, 'blue'); c2.fillStyle = 'blue'; c2.fillText("F = " + obj2.F + "N", obj2.x + 60, 115); }
+        }
+        function loopTab2() {
+            if(obj2.running) { let a = obj2.F / obj2.m; obj2.v += (a * 0.05); obj2.x += obj2.v; if(obj2.x > 650) obj2.running = false; }
+            draw2(); if(obj2.running) anim2 = requestAnimationFrame(loopTab2);
+        }
+        draw2();
+
+        // Tab 3 Logic
+        let c3 = document.getElementById('canvas3').getContext('2d');
+        function drawTab3() {
+            let f = document.getElementById('f3_slider').value; document.getElementById('f3_val').innerText = f; c3.clearRect(0,0,700,200);
+            c3.fillStyle = '#8e44ad'; c3.fillRect(250, 80, 60, 60); c3.fillStyle = '#d35400'; c3.fillRect(390, 80, 60, 60); c3.fillStyle = 'white'; c3.font = "16px Arial"; c3.fillText("A", 275, 115); c3.fillText("B", 415, 115);
+            c3.strokeStyle = 'black'; c3.lineWidth = 2; c3.beginPath(); c3.moveTo(310, 110); c3.lineTo(390, 110); c3.stroke();
+            let vLen = parseFloat(f) * 0.8; drawArrow(c3, 310, 90, 310 + vLen, 90, 'red'); c3.fillStyle = 'red'; c3.fillText("F12 = " + f + "N", 310 + 5, 80);
+            drawArrow(c3, 390, 130, 390 - vLen, 130, 'blue'); c3.fillStyle = 'blue'; c3.fillText("F21 = -" + f + "N", 390 - vLen, 150);
+        }
+        drawTab3();
+
+        // Tab 4 Logic
+        let c4 = document.getElementById('canvas4').getContext('2d');
+        let obj4 = { pos: 0, v: 0, running: false }; let anim4;
+        function updateTab4() { if(!obj4.running) drawTab4(); }
+        function startTab4() { if(!obj4.running) { obj4.running = true; loopTab4(); } }
+        function resetTab4() { obj4.running = false; obj4.pos = 0; obj4.v = 0; cancelAnimationFrame(anim4); drawTab4(); }
+        function drawTab4() {
+            let angleDeg = document.getElementById('angle_slider').value; document.getElementById('angle_val').innerText = angleDeg; let angleRad = angleDeg * Math.PI / 180;
+            c4.clearRect(0,0,700,300); c4.save(); c4.translate(120, 250); let H = 420 * Math.tan(angleRad); let W = 420;
+            c4.beginPath(); c4.moveTo(0, -H); c4.lineTo(0, 0); c4.lineTo(W, 0); c4.closePath(); c4.fillStyle = '#ecf0f1'; c4.fill(); c4.stroke();
+            c4.fillStyle = 'black'; c4.font = "14px Arial"; c4.fillText("θ = " + angleDeg + "°", W - 50, -10);
+            c4.translate(0, -H); c4.rotate(angleRad); let startPos = 40; let currentX = startPos + obj4.pos; c4.translate(currentX, 0); 
+            c4.fillStyle = '#d35400'; c4.fillRect(0, -50, 50, 50); c4.translate(25, -25); 
+            let pLen = 120; let pxLen = pLen * Math.sin(angleRad); let pyLen = pLen * Math.cos(angleRad);
+            drawArrow(c4, 0, 0, 0, -pyLen, '#8e44ad'); c4.fillStyle = '#8e44ad'; c4.fillText("N", 10, -pyLen + 10);
+            if (angleDeg > 0) { drawArrow(c4, 0, 0, pxLen, 0, 'red'); c4.fillStyle = 'red'; c4.fillText("Px", pxLen + 5, -10); drawArrow(c4, 0, 0, 0, pyLen, 'red'); c4.fillStyle = 'red'; c4.fillText("Py", -25, pyLen - 5);
+                c4.strokeStyle = 'red'; c4.lineWidth = 1.5; c4.setLineDash([5, 5]); c4.beginPath(); c4.moveTo(pxLen, 0); c4.lineTo(pxLen, pyLen); c4.stroke(); c4.beginPath(); c4.moveTo(0, pyLen); c4.lineTo(pxLen, pyLen); c4.stroke(); c4.setLineDash([]); }
+            drawArrow(c4, 0, 0, pxLen, pyLen, 'green'); c4.fillStyle = 'green'; c4.fillText("P = mg", pxLen + 5, pyLen + 15); c4.restore();
+        }
+        function loopTab4() {
+            if (obj4.running) { let angleDeg = document.getElementById('angle_slider').value; let angleRad = angleDeg * Math.PI / 180; let g = 9.8; let a = g * Math.sin(angleRad); obj4.v += (a * 0.05); obj4.pos += obj4.v;
+                let maxPos = 420 / Math.cos(angleRad) - 90; if (obj4.pos > maxPos) obj4.running = false; }
+            drawTab4(); if (obj4.running) anim4 = requestAnimationFrame(loopTab4);
+        }
+        drawTab4();
+    </script>
+</body>
+</html>
